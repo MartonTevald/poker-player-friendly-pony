@@ -3,109 +3,104 @@ package org.leanpoker.player;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import java.util.*;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 public class Player {
 
     static final String VERSION = "Gathering data with rainbows";
 
-        private static List<Integer> getCardRanks(JsonArray cards) {
-            List<Integer> ranks = new ArrayList<>();
+    private static List<Integer> getCardRanks(JsonArray cards) {
+        List<Integer> ranks = new ArrayList<>();
 
-            for (JsonElement card : cards) {
-                JsonObject c = card.getAsJsonObject();
-                String currRank = c.get("rank").toString();
-                ranks.add(currRank.equals("J") ?
-                        11 : currRank.equals("Q") ?
-                        12 : currRank.equals("K") ?
-                        13 : currRank.equals("A") ?
-                        14 : c.get("rank").getAsInt());
-            }
-
-            return ranks;
+        for (JsonElement card : cards) {
+            JsonObject c = card.getAsJsonObject();
+            String currRank = c.get("rank").toString();
+            ranks.add(currRank.equals("J") ?
+                    11 : currRank.equals("Q") ?
+                    12 : currRank.equals("K") ?
+                    13 : currRank.equals("A") ?
+                    14 : c.get("rank").getAsInt());
         }
 
-        private static List<String> getCardSuits(JsonArray cards) {
-            List<String> suits = new ArrayList<>();
+        return ranks;
+    }
 
-            for (JsonElement card : cards) {
-                JsonObject c = card.getAsJsonObject();
-                suits.add(c.get("suit").getAsString());
-            }
+    private static List<String> getCardSuits(JsonArray cards) {
+        List<String> suits = new ArrayList<>();
 
-            return suits;
+        for (JsonElement card : cards) {
+            JsonObject c = card.getAsJsonObject();
+            suits.add(c.get("suit").getAsString());
         }
 
-        private static boolean basicStraightCheck(int starter, List<Integer> ranks) {
-            Collections.sort(ranks);
-            int straightCounter = 0;
-            for (int i=starter ; i < ranks.size(); i++) {
-                if (ranks.get(i) == ranks.get(i-1) + 1){
-                    straightCounter++;
+        return suits;
+    }
+
+    private static boolean basicStraightCheck(int starter, List<Integer> ranks) {
+        Collections.sort(ranks);
+        int straightCounter = 0;
+        for (int i=starter ; i < ranks.size(); i++) {
+            if (ranks.get(i) == ranks.get(i-1) + 1){
+                straightCounter++;
+            }
+            else {
+                straightCounter = 0;
+            }
+        }
+        return (straightCounter > 4);
+    }
+
+
+    private static boolean basicFlushCheck(List<String> suits) {
+        int flush = 0;
+        for (String basicSuit : suits) {
+            for (String otherSuit : suits) {
+                if (basicSuit.equals(otherSuit)) {
+                    flush++;
                 }
-                else {
-                    straightCounter = 0;
-                }
-            }
-            if (straightCounter > 4) {
-                return true;
-            } else {
-                return false;
-            }
-        }
-
-
-        private static boolean basicFlushCheck(List<String> suits) {
-            int flush = 0;
-            for (String s : suits) {
-                for (String b: suits) {
-                    if (s.equals(b)) {
-                        flush++;
-                    }
-                    if (flush > 4) {
-                        break;
-                    }
+                if (flush > 4) {
+                    break;
                 }
             }
-            if (flush > 4) {
-                return true;
-            } else {
-                return false;
-            }
         }
+        return (flush > 4);
+    }
 
-        private static boolean FlushCheck(int starter, List<Integer> ranks, List<String> suits) {
-            boolean straightOrNot = basicStraightCheck(starter, ranks);
-            boolean flushOrNot = basicFlushCheck(suits);
+    private static boolean FlushCheck(int starter, List<Integer> ranks, List<String> suits) {
+        boolean straightOrNot = basicStraightCheck(starter, ranks);
+        boolean flushOrNot = basicFlushCheck(suits);
 
 
-            if (straightOrNot && flushOrNot) {
-                return true;
-            } else {
-                return false;
-            }
-        }
+        return (straightOrNot && flushOrNot);
 
-        private static int bestMatch (JsonArray myCards, JsonArray communityCards){
-            List<String> suits;
-            List<Integer> ranks;
-            ranks = getCardRanks(myCards);
-            ranks.addAll(getCardRanks(communityCards));
+    }
+
+    private static boolean checkBestCaseScenario(JsonArray myCards, JsonArray communityCards){
+        List<String> suits;
+        List<Integer> ranks;
+        ranks = getCardRanks(myCards);
+        ranks.addAll(getCardRanks(communityCards));
 
         suits = getCardSuits(myCards);
         suits.addAll(getCardSuits(communityCards));
 
-            //Royal Flush
-            boolean isRoyalFlush = FlushCheck(9, ranks, suits);
-            //Straight Flush
-            boolean isStraightFlush = FlushCheck(1, ranks, suits);
-            //Flush
-            boolean isFlush = basicFlushCheck(suits);
-            //Straight
-            boolean isStraight = basicStraightCheck(1, ranks);
+        //Royal Flush
+        boolean isRoyalFlush = FlushCheck(9, ranks, suits);
+        //Straight Flush
+        boolean isStraightFlush = FlushCheck(1, ranks, suits);
+        //Flush
+        boolean isFlush = basicFlushCheck(suits);
+        //Straight
+        boolean isStraight = basicStraightCheck(1, ranks);
 
-            return 0;
+        if( isRoyalFlush || isStraightFlush || isFlush || isStraight) {
+            return true;
         }
+        return false;
+    }
 
     public static int betRequest(JsonElement request) {
         // Obtaining the JSON file
@@ -132,11 +127,13 @@ public class Player {
         JsonArray communityCards = json.get("community_cards").getAsJsonArray();
         JsonArray in_hand_cards = myPlayer.get("hole_cards").getAsJsonArray();
 
+
         // Getting round info
         int bet_round = json.get("bet_index").getAsInt();
         int ourChips = myPlayer.get("stack").getAsInt();
         int ourBet = myPlayer.get("bet").getAsInt();
         int highestBet = 0;
+
 
         for (JsonElement player : players) {
             if (player.getAsJsonObject().get("bet").getAsInt() > highestBet) {
@@ -148,9 +145,18 @@ public class Player {
         int check = current_buy_in - ourBet;
         int raise = current_buy_in - ourBet + minimum_raise;
 
-        if (checkForPairs(in_hand_cards, communityCards, bet_round)) {
-            return raise + (int) (pot * 0.1);
+
+
+
+        if(checkBestCaseScenario(in_hand_cards, communityCards)) return 1000;
+
+        if(checkForTwoPairs(in_hand_cards, communityCards)){
+            return raise + 200;
         }
+        if (checkForPairs(in_hand_cards, communityCards, bet_round)) {
+            return raise + 100;
+        }
+
 
         return check;
     }
@@ -169,13 +175,30 @@ public class Player {
         for (JsonElement card : community_cards) {
             String cardRank = card.getAsJsonObject().get("rank").getAsString();
 
+
             if (cardRank.equals(handCard1) || cardRank.equals(handCard2)) {
                 return true;
             }
         }
+
         return false;
     }
 
+    private static boolean checkForTwoPairs(JsonArray in_hand_cards, JsonArray community_cards) {
+        String handCard1 = in_hand_cards.get(0).getAsJsonObject().get("rank").getAsString();
+        String handCard2 = in_hand_cards.get(1).getAsJsonObject().get("rank").getAsString();
+        int foundPairs = 0;
+
+        for (JsonElement card : community_cards) {
+            String cardRank = card.getAsJsonObject().get("rank").getAsString();
+
+            if (cardRank.equals(handCard1) || cardRank.equals(handCard2)) {
+                foundPairs++;
+            }
+        }
+
+        return foundPairs >= 2;
+    }
 }
 
 
