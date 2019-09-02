@@ -50,18 +50,14 @@ public class Player {
                 straightCounter = 0;
             }
         }
-        if (straightCounter > 4) {
-            return true;
-        } else {
-            return false;
-        }
+        return (straightCounter > 4);
     }
 
 
     private static boolean basicFlushCheck(List<String> suits) {
         int flush = 0;
         for (String basicSuit : suits) {
-            for (String otherSuit: suits) {
+            for (String otherSuit : suits) {
                 if (basicSuit.equals(otherSuit)) {
                     flush++;
                 }
@@ -70,11 +66,7 @@ public class Player {
                 }
             }
         }
-        if (flush > 4) {
-            return true;
-        } else {
-            return false;
-        }
+        return (flush > 4);
     }
 
     private static boolean FlushCheck(int starter, List<Integer> ranks, List<String> suits) {
@@ -82,15 +74,11 @@ public class Player {
         boolean flushOrNot = basicFlushCheck(suits);
 
 
-        if (straightOrNot && flushOrNot) {
-            return true;
-        } else {
-            return false;
-        }
+        return (straightOrNot && flushOrNot);
+
     }
 
-    private static int bestCaseScenario (JsonArray myCards, JsonArray communityCards){
-        int result = 0;
+    private static boolean checkBestCaseScenario(JsonArray myCards, JsonArray communityCards){
         List<String> suits;
         List<Integer> ranks;
         ranks = getCardRanks(myCards);
@@ -109,9 +97,9 @@ public class Player {
         boolean isStraight = basicStraightCheck(1, ranks);
 
         if( isRoyalFlush || isStraightFlush || isFlush || isStraight) {
-            result = 1000;
+            return true;
         }
-        return result;
+        return false;
     }
 
     public static int betRequest(JsonElement request) {
@@ -139,11 +127,13 @@ public class Player {
         JsonArray communityCards = json.get("community_cards").getAsJsonArray();
         JsonArray in_hand_cards = myPlayer.get("hole_cards").getAsJsonArray();
 
+
         // Getting round info
         int bet_round = json.get("bet_index").getAsInt();
         int ourChips = myPlayer.get("stack").getAsInt();
         int ourBet = myPlayer.get("bet").getAsInt();
         int highestBet = 0;
+
 
         for (JsonElement player : players) {
             if (player.getAsJsonObject().get("bet").getAsInt() > highestBet) {
@@ -155,6 +145,7 @@ public class Player {
         int check = current_buy_in - ourBet;
         int raise = current_buy_in - ourBet + minimum_raise;
 
+        if(checkBestCaseScenario(in_hand_cards, communityCards)) return 1000;
 
         if(checkForTwoPairs(in_hand_cards, communityCards)){
             return raise + 300;
@@ -166,6 +157,7 @@ public class Player {
         if(raise > ourChips/2){
             return 0;
         }
+
 
         return check;
     }
@@ -184,10 +176,12 @@ public class Player {
         for (JsonElement card : community_cards) {
             String cardRank = card.getAsJsonObject().get("rank").getAsString();
 
+
             if (cardRank.equals(handCard1) || cardRank.equals(handCard2)) {
                 return true;
             }
         }
+
         return false;
     }
 
