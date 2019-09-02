@@ -157,10 +157,10 @@ public class Player {
         //if (checkBestCaseScenario(in_hand_cards, communityCards)) return 1000;
 
         if (checkForTwoPairs(in_hand_cards, communityCards)){
-            return raise + 300;
+            return raise + 500;
         }
         if (checkForPairs(in_hand_cards, communityCards, bet_round)) {
-            return raise + 150;
+            return raise + 250;
         }
 
         if(raise > ourChips/2){
