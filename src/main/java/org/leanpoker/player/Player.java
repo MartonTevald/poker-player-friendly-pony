@@ -92,8 +92,11 @@ public class Player {
         int check = current_buy_in - ourBet;
         int raise = current_buy_in - ourBet + minimum_raise;
 
+        if(checkForTwoPairs(in_hand_cards, communityCards)){
+            return raise + 200;
+        }
         if (checkForPairs(in_hand_cards, communityCards, bet_round)) {
-            return raise + (int) (pot * 0.1);
+            return raise + 100;
         }
 
         return check;
@@ -120,6 +123,21 @@ public class Player {
         return false;
     }
 
+    private static boolean checkForTwoPairs(JsonArray in_hand_cards, JsonArray community_cards) {
+        String handCard1 = in_hand_cards.get(0).getAsJsonObject().get("rank").getAsString();
+        String handCard2 = in_hand_cards.get(1).getAsJsonObject().get("rank").getAsString();
+        int foundPairs = 0;
+
+        for (JsonElement card : community_cards) {
+            String cardRank = card.getAsJsonObject().get("rank").getAsString();
+
+            if (cardRank.equals(handCard1) || cardRank.equals(handCard2)) {
+                foundPairs++;
+            }
+        }
+
+        return foundPairs >= 2;
+    }
 }
 
 
