@@ -3,13 +3,14 @@ package org.leanpoker.player;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import netscape.javascript.JSObject;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class Player {
 
-    static final String VERSION = "Java 0.1";
+    static final String VERSION = "Gathering data with rainbows";
 
     private static List<Integer> getCardRanks(JsonArray cards) {
         List<Integer> ranks = new ArrayList<>();
@@ -76,9 +77,16 @@ public class Player {
             JsonArray communityCards = json.get("community_cards").getAsJsonArray();
             JsonArray in_hand_cards = myPlayer.get("hole_cards").getAsJsonArray();
 
-            // Getting round info
-            int ourChips = myPlayer.get("stack").getAsInt();
-            int ourBet = myPlayer.get("bet").getAsInt();
+        // Getting round info
+        int ourChips = myPlayer.get("stack").getAsInt();
+        int ourBet = myPlayer.get("bet").getAsInt();
+        int highestBet = 0;
+
+        for(JsonElement player: players){
+            if(player.getAsJsonObject().get("bet").getAsInt() > highestBet){
+                highestBet = player.getAsJsonObject().get("bet").getAsInt();
+            }
+        }
 
             // This is the call method
             int check = current_buy_in - ourBet;
