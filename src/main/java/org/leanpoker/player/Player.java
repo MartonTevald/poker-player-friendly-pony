@@ -157,7 +157,7 @@ public class Player {
         //if (checkBestCaseScenario(in_hand_cards, communityCards)) return 1000;
         int raises = 0;
 
-        if (raises < 2) {
+        if (raises < 1) {
             if (checkForTwoPairs(in_hand_cards, communityCards)) {
                 raises++;
                 return raise + 350;
