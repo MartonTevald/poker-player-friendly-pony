@@ -4,52 +4,81 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class Player {
 
     static final String VERSION = "Gathering data with rainbows";
 
-    private static List<Integer> getCardRanks(JsonArray cards) {
-        List<Integer> ranks = new ArrayList<>();
+        private static List<Integer> getCardRanks(JsonArray cards) {
+            List<Integer> ranks = new ArrayList<>();
 
-        for (JsonElement card : cards) {
-            JsonObject c = card.getAsJsonObject();
-            String currRank = c.get("rank").toString();
-            ranks.add(currRank.equals("J") ?
-                    11 : currRank.equals("Q") ?
-                    12 : currRank.equals("K") ?
-                    13 : currRank.equals("A") ?
-                    14 : c.get("rank").getAsInt());
+            for (JsonElement card : cards) {
+                JsonObject c = card.getAsJsonObject();
+                String currRank = c.get("rank").toString();
+                ranks.add(currRank.equals("J") ?
+                        11 : currRank.equals("Q") ?
+                        12 : currRank.equals("K") ?
+                        13 : currRank.equals("A") ?
+                        14 : c.get("rank").getAsInt());
+            }
+
+            return ranks;
         }
 
-        return ranks;
-    }
+        private static List<String> getCardSuits(JsonArray cards) {
+            List<String> suits = new ArrayList<>();
 
-    private static List<String> getCardSuits(JsonArray cards) {
-        List<String> suits = new ArrayList<>();
+            for (JsonElement card : cards) {
+                JsonObject c = card.getAsJsonObject();
+                suits.add(c.get("suit").getAsString());
+            }
 
-        for (JsonElement card : cards) {
-            JsonObject c = card.getAsJsonObject();
-            suits.add(c.get("suit").getAsString());
+            return suits;
         }
 
-        return suits;
-    }
 
+        private static boolean FlushCheck(int starter, List<Integer> ranks, List<String> suits) {
+            Collections.sort(ranks);
+            int flushCounter = 0;
+            for (int i=starter ; i < ranks.size(); i++) {
+                if (ranks.get(i) == ranks.get(i-1) + 1){
+                    flushCounter++;
+                }
+                else {
+                    flushCounter = 0;
+                }
+            }
 
-    private static int bestMatch(JsonArray myCards, JsonArray communityCards) {
-        List<String> suits;
-        List<Integer> ranks;
-        ranks = getCardRanks(myCards);
-        ranks.addAll(getCardRanks(communityCards));
+            // if Hashset is not good enough
+            //Set<String> currentSuits = suits.stream().collect(Collectors.toSet());
+            HashSet<String> currentSuits = new HashSet<>(suits);
+            int uniqueSuits = currentSuits.size();
+
+            if (flushCounter > 4 && uniqueSuits == 0) {
+                return true;
+            } else {
+                return false;
+            }
+        }
+
+        private static int bestMatch (JsonArray myCards, JsonArray communityCards){
+            List<String> suits;
+            List<Integer> ranks;
+            ranks = getCardRanks(myCards);
+            ranks.addAll(getCardRanks(communityCards));
 
         suits = getCardSuits(myCards);
         suits.addAll(getCardSuits(communityCards));
 
-        return 0;
-    }
+            //Royal Flush
+            Boolean isRoyalFlush = FlushCheck(9, ranks, suits);
+            //Straight Flush
+            Boolean isFlush = FlushCheck(1, ranks, suits);
+
+            return 0;
+        }
 
     public static int betRequest(JsonElement request) {
         // Obtaining the JSON file
