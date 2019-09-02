@@ -61,12 +61,12 @@ public class Player {
                 if (basicSuit.equals(otherSuit)) {
                     flush++;
                 }
-                if (flush > 4) {
+                if (flush > 5) {
                     break;
                 }
             }
         }
-        return (flush > 4);
+        return (flush > 5);
     }
 
     private static boolean FlushCheck(int starter, List<Integer> ranks, List<String> suits) {
