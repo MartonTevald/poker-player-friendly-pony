@@ -8,7 +8,7 @@ import java.util.Map;
 
 public class Player {
 
-    static final String VERSION = "Java 0.1";
+    static final String VERSION = "Gathering data with rainbows";
 
     public static int betRequest(JsonElement request) {
         // Obtaining the JSON file
