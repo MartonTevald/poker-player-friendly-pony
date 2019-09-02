@@ -92,9 +92,9 @@ public class Player {
         int check = current_buy_in - ourBet;
         int raise = current_buy_in - ourBet + minimum_raise;
 
-//        if (checkForPairs(in_hand_cards, communityCards, bet_round)) {
-//            return raise + (pot / 100) * 10;
-//        }
+        if (checkForPairs(in_hand_cards, communityCards, bet_round)) {
+            return raise + (int) (pot * 0.1);
+        }
 
         return check;
     }
@@ -106,14 +106,18 @@ public class Player {
         int handCard1 = in_hand_cards.get(0).getAsJsonObject().get("rank").getAsInt();
         int handCard2 = in_hand_cards.get(1).getAsJsonObject().get("rank").getAsInt();
 
-        if(bet_round==0 && handCard1 == handCard2){
+        if (bet_round == 0 && handCard1 == handCard2) {
             return true;
         }
 
-//        for (JsonElement card : community_cards){
-//
-//        }
+        for (JsonElement card : community_cards) {
+            int cardRank = card.getAsJsonObject().get("rank").getAsInt();
 
+            if (cardRank == handCard1 || cardRank == handCard2) {
+                return true;
+            }
+        }
+        return false;
     }
 
 }
