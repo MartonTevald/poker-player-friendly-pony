@@ -39,81 +39,113 @@ public class Player {
     }
 
 
-        private static int bestMatch (JsonArray myCards, JsonArray communityCards){
-            List<String> suits;
-            List<Integer> ranks;
-            ranks = getCardRanks(myCards);
-            ranks.addAll(getCardRanks(communityCards));
+    private static int bestMatch(JsonArray myCards, JsonArray communityCards) {
+        List<String> suits;
+        List<Integer> ranks;
+        ranks = getCardRanks(myCards);
+        ranks.addAll(getCardRanks(communityCards));
 
-            suits = getCardSuits(myCards);
-            suits.addAll(getCardSuits(communityCards));
+        suits = getCardSuits(myCards);
+        suits.addAll(getCardSuits(communityCards));
 
-            return 0;
-        }
-
-        public static int betRequest (JsonElement request){
-            // Obtaining the JSON file
-            JsonObject json = request.getAsJsonObject();
-
-            // Obtaining player information
-            JsonArray players = json.get("players").getAsJsonArray();
-
-            int in_action = json.get("in_action").getAsInt();
-            JsonObject myPlayer = players.get(in_action).getAsJsonObject();
-
-            // Getting the roles [dealer, small blind, big blind
-            int small_blind = json.get("small_blind").getAsInt();
-            int big_blind = small_blind * 2;
-            int dealer = json.get("dealer").getAsInt();
-
-
-            // Getting info on chips
-            int pot = json.get("pot").getAsInt();
-            int current_buy_in = json.get("current_buy_in").getAsInt();
-            int minimum_raise = json.get("minimum_raise").getAsInt();
-
-            // Get card info
-            JsonArray communityCards = json.get("community_cards").getAsJsonArray();
-            JsonArray in_hand_cards = myPlayer.get("hole_cards").getAsJsonArray();
-
-            // Getting round info
-            int bettingRound = json.get("bet_index").getAsInt();
-            int ourChips = myPlayer.get("stack").getAsInt();
-            int ourBet = myPlayer.get("bet").getAsInt();
-            int highestBet = 0;
-
-            for(JsonElement player: players){
-                if(player.getAsJsonObject().get("bet").getAsInt() > highestBet){
-                    highestBet = player.getAsJsonObject().get("bet").getAsInt();
-                }
-            }
-
-            // This is the call method
-            int check = current_buy_in - ourBet;
-            int raise = current_buy_in - ourBet + minimum_raise;
-
-
-            switch (bettingRound) {
-                case 0:
-                    //preflop();
-                    break;
-                case 1:
-                    //flop();
-                    break;
-                case 2:
-                    //river();
-                    break;
-                case 3:
-                    //turn();
-                    break;
-            }
-
-
-
-            return check;
-        }
-
-        public static void showdown (JsonElement game){
-        }
+        return 0;
     }
+
+    public static int betRequest(JsonElement request) {
+        // Obtaining the JSON file
+        JsonObject json = request.getAsJsonObject();
+
+        // Obtaining player information
+        JsonArray players = json.get("players").getAsJsonArray();
+
+        int in_action = json.get("in_action").getAsInt();
+        JsonObject myPlayer = players.get(in_action).getAsJsonObject();
+
+        // Getting the roles [dealer, small blind, big blind
+        int small_blind = json.get("small_blind").getAsInt();
+        int big_blind = small_blind * 2;
+        int dealer = json.get("dealer").getAsInt();
+
+
+        // Getting info on chips
+        int pot = json.get("pot").getAsInt();
+        int current_buy_in = json.get("current_buy_in").getAsInt();
+        int minimum_raise = json.get("minimum_raise").getAsInt();
+
+        // Get card info
+        JsonArray communityCards = json.get("community_cards").getAsJsonArray();
+        JsonArray in_hand_cards = myPlayer.get("hole_cards").getAsJsonArray();
+
+
+        // Getting round info
+        int bet_round = json.get("bet_index").getAsInt();
+        int ourChips = myPlayer.get("stack").getAsInt();
+        int ourBet = myPlayer.get("bet").getAsInt();
+        int highestBet = 0;
+
+
+        for (JsonElement player : players) {
+            if (player.getAsJsonObject().get("bet").getAsInt() > highestBet) {
+                highestBet = player.getAsJsonObject().get("bet").getAsInt();
+            }
+        }
+
+        // This is the call method
+        int check = current_buy_in - ourBet;
+        int raise = current_buy_in - ourBet + minimum_raise;
+
+
+
+        switch (bet_round) {
+            case 0:
+                return preflop(in_hand_cards, communityCards, bet_round, raise, pot, check);
+            case 1:
+                //flop();
+                break;
+            case 2:
+                //river();
+                break;
+            case 3:
+                //turn();
+                break;
+        }
+
+
+
+        return check;
+    }
+
+    private static int preflop(JsonArray in_hand_cards, JsonArray communityCards, int bet_round, int raise, int pot, int check) {
+        return pairsInHand(in_hand_cards, communityCards, bet_round, raise, pot, check);
+
+    }
+
+    private static int pairsInHand(JsonArray in_hand_cards, JsonArray communityCards, int bet_round, int raise, int pot, int check) {
+        if (checkForPairs(in_hand_cards, communityCards, bet_round)) {
+            return raise + (pot / 100) * 10;
+        }
+        return check;
+    }
+
+
+    static void showdown(JsonElement game) {
+    }
+
+    private static boolean checkForPairs(JsonArray in_hand_cards, JsonArray community_cards, int bet_round) {
+        int handCard1 = in_hand_cards.get(0).getAsJsonObject().get("rank").getAsInt();
+        int handCard2 = in_hand_cards.get(1).getAsJsonObject().get("rank").getAsInt();
+
+        if(bet_round==0 && handCard1 == handCard2){
+            return true;
+        }
+
+//        for (JsonElement card : community_cards){
+//
+//        }
+
+        return false;
+    }
+
+}
+
 
