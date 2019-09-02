@@ -17,14 +17,13 @@ public class Player {
         JsonArray players = json.get("players").getAsJsonArray();
         int in_action = json.get("in_action").getAsInt();
 
-        int bet = json.get("bet").getAsInt();
+        JsonObject myPlayer = players.get(in_action).getAsJsonObject();
+        int bet = myPlayer.get("bet").getAsInt();
 
 
+        return current_buy_in - bet;
 
-        current_buy_in - players[in_action][bet];
 
-
-        return 0;
     }
 
     public static void showdown(JsonElement game) {
