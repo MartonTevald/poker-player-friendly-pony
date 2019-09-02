@@ -3,6 +3,7 @@ package org.leanpoker.player;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import netscape.javascript.JSObject;
 
 import java.util.Map;
 
@@ -38,6 +39,13 @@ public class Player {
         // Getting round info
         int ourChips = myPlayer.get("stack").getAsInt();
         int ourBet = myPlayer.get("bet").getAsInt();
+        int highestBet = 0;
+
+        for(JsonElement player: players){
+            if(player.getAsJsonObject().get("bet").getAsInt() > highestBet){
+                highestBet = player.getAsJsonObject().get("bet").getAsInt();
+            }
+        }
 
         // This is the call method
         int check = current_buy_in - ourBet;
