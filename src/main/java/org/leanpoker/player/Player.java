@@ -92,9 +92,9 @@ public class Player {
         int check = current_buy_in - ourBet;
         int raise = current_buy_in - ourBet + minimum_raise;
 
-//        if (checkForPairs(in_hand_cards, communityCards, bet_round)) {
-//            return raise + (int) (pot * 0.1);
-//        }
+        if (checkForPairs(in_hand_cards, communityCards, bet_round)) {
+            return raise + (int) (pot * 0.1);
+        }
 
         return check;
     }
@@ -103,17 +103,17 @@ public class Player {
     }
 
     private static boolean checkForPairs(JsonArray in_hand_cards, JsonArray community_cards, int bet_round) {
-        int handCard1 = in_hand_cards.get(0).getAsJsonObject().get("rank").getAsInt();
-        int handCard2 = in_hand_cards.get(1).getAsJsonObject().get("rank").getAsInt();
+        String handCard1 = in_hand_cards.get(0).getAsJsonObject().get("rank").getAsString();
+        String handCard2 = in_hand_cards.get(1).getAsJsonObject().get("rank").getAsString();
 
-        if (bet_round == 0 && handCard1 == handCard2) {
+        if (bet_round == 0 && handCard1.equals(handCard2)) {
             return true;
         }
 
         for (JsonElement card : community_cards) {
-            int cardRank = card.getAsJsonObject().get("rank").getAsInt();
+            String cardRank = card.getAsJsonObject().get("rank").getAsString();
 
-            if (cardRank == handCard1 || cardRank == handCard2) {
+            if (cardRank.equals(handCard1) || cardRank.equals(handCard2)) {
                 return true;
             }
         }
