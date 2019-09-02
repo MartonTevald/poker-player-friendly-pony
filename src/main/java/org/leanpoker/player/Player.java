@@ -154,7 +154,7 @@ public class Player {
         int check = current_buy_in - ourBet;
         int raise = current_buy_in - ourBet + minimum_raise;
 
-        if (checkBestCaseScenario(in_hand_cards, communityCards)) return 1000;
+        //if (checkBestCaseScenario(in_hand_cards, communityCards)) return 1000;
 
         if (checkForTwoPairs(in_hand_cards, communityCards)){
             return raise + 300;
