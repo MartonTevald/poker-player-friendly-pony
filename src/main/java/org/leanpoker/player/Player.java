@@ -155,18 +155,24 @@ public class Player {
         int raise = current_buy_in - ourBet + minimum_raise;
 
         //if (checkBestCaseScenario(in_hand_cards, communityCards)) return 1000;
+        int raises = 0;
 
-        if (checkForTwoPairs(in_hand_cards, communityCards)){
-            return raise + 350;
-        }
-        if (checkForPairs(in_hand_cards, communityCards, bet_round)) {
-            return raise + 150;
-        }
+        if (raises < 2) {
+            if (checkForTwoPairs(in_hand_cards, communityCards)) {
+                raises++;
+                return raise + 350;
+            }
+            if (checkForPairs(in_hand_cards, communityCards, bet_round)) {
+                raises++;
+                return raise + 150;
+            }
 
-        if(raise > ourChips/2){
-            return 0;
+            if (raise > ourChips / 2) {
+                return 0;
+            }
+        } else {
+            return check;
         }
-
 
         return check;
     }
