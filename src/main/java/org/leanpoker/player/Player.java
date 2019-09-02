@@ -3,9 +3,7 @@ package org.leanpoker.player;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class Player {
 
@@ -38,25 +36,50 @@ public class Player {
             return suits;
         }
 
-
-        private static boolean FlushCheck(int starter, List<Integer> ranks, List<String> suits) {
+        private static boolean basicStraightCheck(int starter, List<Integer> ranks) {
             Collections.sort(ranks);
-            int flushCounter = 0;
+            int straightCounter = 0;
             for (int i=starter ; i < ranks.size(); i++) {
                 if (ranks.get(i) == ranks.get(i-1) + 1){
-                    flushCounter++;
+                    straightCounter++;
                 }
                 else {
-                    flushCounter = 0;
+                    straightCounter = 0;
                 }
             }
+            if (straightCounter > 4) {
+                return true;
+            } else {
+                return false;
+            }
+        }
 
-            // if Hashset is not good enough
-            //Set<String> currentSuits = suits.stream().collect(Collectors.toSet());
-            HashSet<String> currentSuits = new HashSet<>(suits);
-            int uniqueSuits = currentSuits.size();
 
-            if (flushCounter > 4 && uniqueSuits == 0) {
+        private static boolean basicFlushCheck(List<String> suits) {
+            int flush = 0;
+            for (String s : suits) {
+                for (String b: suits) {
+                    if (s.equals(b)) {
+                        flush++;
+                    }
+                    if (flush > 4) {
+                        break;
+                    }
+                }
+            }
+            if (flush > 4) {
+                return true;
+            } else {
+                return false;
+            }
+        }
+
+        private static boolean FlushCheck(int starter, List<Integer> ranks, List<String> suits) {
+            boolean straightOrNot = basicStraightCheck(starter, ranks);
+            boolean flushOrNot = basicFlushCheck(suits);
+
+
+            if (straightOrNot && flushOrNot) {
                 return true;
             } else {
                 return false;
@@ -73,9 +96,13 @@ public class Player {
         suits.addAll(getCardSuits(communityCards));
 
             //Royal Flush
-            Boolean isRoyalFlush = FlushCheck(9, ranks, suits);
+            boolean isRoyalFlush = FlushCheck(9, ranks, suits);
             //Straight Flush
-            Boolean isFlush = FlushCheck(1, ranks, suits);
+            boolean isStraightFlush = FlushCheck(1, ranks, suits);
+            //Flush
+            boolean isFlush = basicFlushCheck(suits);
+            //Straight
+            boolean isStraight = basicStraightCheck(1, ranks);
 
             return 0;
         }
