@@ -92,9 +92,9 @@ public class Player {
         int check = current_buy_in - ourBet;
         int raise = current_buy_in - ourBet + minimum_raise;
 
-        if (checkForPairs(in_hand_cards, communityCards, bet_round)) {
-            return raise + (int) (pot * 0.1);
-        }
+//        if (checkForPairs(in_hand_cards, communityCards, bet_round)) {
+//            return raise + (int) (pot * 0.1);
+//        }
 
         return check;
     }
