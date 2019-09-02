@@ -77,6 +77,7 @@ public class Player {
             JsonArray in_hand_cards = myPlayer.get("hole_cards").getAsJsonArray();
 
             // Getting round info
+            int bettingRound = json.get("bet_index").getAsInt();
             int ourChips = myPlayer.get("stack").getAsInt();
             int ourBet = myPlayer.get("bet").getAsInt();
             int highestBet = 0;
@@ -90,6 +91,24 @@ public class Player {
             // This is the call method
             int check = current_buy_in - ourBet;
             int raise = current_buy_in - ourBet + minimum_raise;
+
+
+            switch (bettingRound) {
+                case 0:
+                    //preflop();
+                    break;
+                case 1:
+                    //flop();
+                    break;
+                case 2:
+                    //river();
+                    break;
+                case 3:
+                    //turn();
+                    break;
+            }
+
+
 
             return check;
         }
