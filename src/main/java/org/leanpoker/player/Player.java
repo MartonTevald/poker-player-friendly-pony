@@ -155,15 +155,16 @@ public class Player {
         int check = current_buy_in - ourBet;
         int raise = current_buy_in - ourBet + minimum_raise;
 
-        if(raise > ourChips/2){
-            return 0;
-        }
 
         if(checkForTwoPairs(in_hand_cards, communityCards)){
-            return raise + 200;
+            return raise + 300;
         }
         if (checkForPairs(in_hand_cards, communityCards, bet_round)) {
-            return raise + 100;
+            return raise + 150;
+        }
+
+        if(raise > ourChips/2){
+            return 0;
         }
 
         return check;
