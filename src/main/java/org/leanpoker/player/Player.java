@@ -92,21 +92,28 @@ public class Player {
         int check = current_buy_in - ourBet;
         int raise = current_buy_in - ourBet + minimum_raise;
 
-        if (checkForPairsInHand(in_hand_cards, bet_round)) {
-            return raise + (pot / 100) * 10;
-        }
+//        if (checkForPairs(in_hand_cards, communityCards, bet_round)) {
+//            return raise + (pot / 100) * 10;
+//        }
 
         return check;
     }
 
-    public static void showdown(JsonElement game) {
+    static void showdown(JsonElement game) {
     }
 
-    public static boolean checkForPairsInHand(JsonArray in_hand_cards, int bet_round) {
+    private static boolean checkForPairs(JsonArray in_hand_cards, JsonArray community_cards, int bet_round) {
         int handCard1 = in_hand_cards.get(0).getAsJsonObject().get("rank").getAsInt();
         int handCard2 = in_hand_cards.get(1).getAsJsonObject().get("rank").getAsInt();
 
-        return (handCard1 == handCard2 && bet_round == 0);
+        if(bet_round==0 && handCard1 == handCard2){
+            return true;
+        }
+
+//        for (JsonElement card : community_cards){
+//
+//        }
+
     }
 
 }
