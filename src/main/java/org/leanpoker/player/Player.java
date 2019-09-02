@@ -74,15 +74,11 @@ public class Player {
         boolean flushOrNot = basicFlushCheck(suits);
 
 
-        if (straightOrNot && flushOrNot) {
-            return true;
-        } else {
-            return false;
-        }
+        return (straightOrNot && flushOrNot);
+
     }
 
-    private static int bestCaseScenario (JsonArray myCards, JsonArray communityCards){
-        int result = 0;
+    private static boolean checkBestCaseScenario(JsonArray myCards, JsonArray communityCards){
         List<String> suits;
         List<Integer> ranks;
         ranks = getCardRanks(myCards);
@@ -101,9 +97,9 @@ public class Player {
         boolean isStraight = basicStraightCheck(1, ranks);
 
         if( isRoyalFlush || isStraightFlush || isFlush || isStraight) {
-            result = 1000;
+            return true;
         }
-        return result;
+        return false;
     }
 
     public static int betRequest(JsonElement request) {
@@ -131,11 +127,13 @@ public class Player {
         JsonArray communityCards = json.get("community_cards").getAsJsonArray();
         JsonArray in_hand_cards = myPlayer.get("hole_cards").getAsJsonArray();
 
+
         // Getting round info
         int bet_round = json.get("bet_index").getAsInt();
         int ourChips = myPlayer.get("stack").getAsInt();
         int ourBet = myPlayer.get("bet").getAsInt();
         int highestBet = 0;
+
 
         for (JsonElement player : players) {
             if (player.getAsJsonObject().get("bet").getAsInt() > highestBet) {
@@ -148,11 +146,16 @@ public class Player {
         int raise = current_buy_in - ourBet + minimum_raise;
 
         if(checkForTwoPairs(in_hand_cards, communityCards)){
-            return raise + 200;
+            return raise + 300;
         }
         if (checkForPairs(in_hand_cards, communityCards, bet_round)) {
-            return raise + 100;
+            return raise + 150;
         }
+
+        if(raise > ourChips/2){
+            return 0;
+        }
+
 
         return check;
     }
@@ -171,10 +174,12 @@ public class Player {
         for (JsonElement card : community_cards) {
             String cardRank = card.getAsJsonObject().get("rank").getAsString();
 
+
             if (cardRank.equals(handCard1) || cardRank.equals(handCard2)) {
                 return true;
             }
         }
+
         return false;
     }
 
