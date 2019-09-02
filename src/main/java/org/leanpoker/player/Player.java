@@ -55,18 +55,27 @@ public class Player {
 
 
     private static boolean basicFlushCheck(List<String> suits) {
-        int flush = 0;
-        for (String basicSuit : suits) {
-            for (String otherSuit : suits) {
-                if (basicSuit.equals(otherSuit)) {
-                    flush++;
-                }
-                if (flush > 5) {
-                    break;
-                }
+        int spades = 0 ;
+        int hearts = 0 ;
+        int clubs = 0 ;
+        int diamonds= 0 ;
+
+        for (String suit : suits) {
+            if (suit.equals("spades")){
+                spades++;
+            }
+            if (suit.equals("hearts")){
+                hearts++;
+            }
+            if (suit.equals("clubs")){
+                clubs++;
+            }
+            if (suit.equals("diamonds")){
+                diamonds++;
             }
         }
-        return (flush > 5);
+
+        return (spades > 4 || hearts > 4 || clubs > 4 || diamonds > 4);
     }
 
     private static boolean FlushCheck(int starter, List<Integer> ranks, List<String> suits) {
